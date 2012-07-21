@@ -1,5 +1,7 @@
 package nz.uberutils.helpers
 
+import org.powerbot.concurrent.Task
+
 /**
  * Created by IntelliJ IDEA.
  * User: Taylor
@@ -7,8 +9,6 @@ package nz.uberutils.helpers
  * Time: 11:51 AM
  * Package: nz.uberfalconry;
  */
-trait Strategy {
-  def execute()
-  def isValid: Boolean
+trait Strategy extends org.powerbot.concurrent.strategy.Strategy with Task {
   def getStatus: String
 }
