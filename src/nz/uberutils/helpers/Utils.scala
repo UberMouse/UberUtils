@@ -18,13 +18,12 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import java.net.{URI, URL}
-import java.util.logging.Logger
 import java.util
 
 object Utils {
 
   private val WALL: Int    = 0x200000
-  private val log : Logger = Logger.getAnonymousLogger
+  private val log : java.util.logging.Logger = java.util.logging.Logger.getAnonymousLogger
 
   /**
    * Finds if the current world is a members world or not.
@@ -39,7 +38,7 @@ object Utils {
    *
    * @param text info to be logged
    */
-  def log(text: AnyRef) = log info "" + text
+  def log(text: AnyRef): Unit = log info "" + text
 
   /**
    * Check if array contains String(s) check.
@@ -90,18 +89,6 @@ object Utils {
   def arrayContains(array: Array[LootItem], check: Int*): Boolean = {
     if (array == null || check == null || array.length < 1) return false
     array.exists(loot => check.exists(_ == loot.getId))
-  }
-
-  /**
-   * Check if array of LootItems contains names(s) check.
-   *
-   * @param array the array
-   * @param check the check
-   * @return true, if successful
-   */
-  def arrayContains(array: Array[LootItem], check: String*): Boolean = {
-    if (array == null || check == null || array.length < 1) return false
-    array.exists(loot => check.exists(checkName => loot.getName.equals(checkName) || loot.getName.contains(checkName)))
   }
 
   def getNearestNonWallTile(tile: Tile, eightTiles: Boolean = false): Tile = {
@@ -197,7 +184,7 @@ object Utils {
 
   def getLoadedTiles: Array[Tile] = {
     val flags: Array[Array[Int]] = Walking.getCollisionFlags(Game.getPlane)
-    val t: util.ArrayList[Tile] = new util.ArrayList[Tile] {
+    lazy val t: util.ArrayList[Tile] = new util.ArrayList[Tile] {
       var i: Int = 0
       while (i < flags.length) {
         val xOff: Int = i + Game.getMapBase.getX + Walking.getCollisionOffset(Game.getPlane).getX
@@ -211,7 +198,7 @@ object Utils {
                                         .getCollisionOffset(Game
                                                             .getPlane)
                                         .getY
-            t
+                                  t
             .add(new Tile(xOff,
                           yOff,
                           0))
@@ -433,7 +420,7 @@ object Utils {
    * @param c1 Main component ID
    * @param c2 Sub component ID
    */
-  def sleepUntilValid(c1: Int, c2: Int) = sleepUntilValid(c1, c2, 15)
+  def sleepUntilValid(c1: Int, c2: Int): Unit = sleepUntilValid(c1, c2, 15)
 
   /**
    * Get random Tile in Area

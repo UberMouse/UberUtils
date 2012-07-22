@@ -10,7 +10,7 @@ import org.powerbot.game.api.util.Time
  */
 
 object Wait {
-  def For(condition: => Boolean, timeout: Int = 10)(implicit callback: => Unit = {}):Boolean = {
+  def For(condition: => Boolean, timeout: Int = 10)(callback: => Unit = {}):Boolean = {
     var times = 0
     while(times < timeout && !condition) {
       times += 1
@@ -21,7 +21,7 @@ object Wait {
     times != timeout
   }
 
-  def While(condition: => Boolean, timeout: Int = 10)(implicit callback: => Unit = {}):Boolean = {
+  def While(condition: => Boolean, timeout: Int = 10)(callback: => Unit = {}):Boolean = {
       var times = 0
       while(times < timeout && condition) {
         times += 1

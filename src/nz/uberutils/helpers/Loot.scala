@@ -68,13 +68,13 @@ object Loot {
         if (PriceThread.priceForId(id) > 0) add = PriceThread.priceForId(id) * 1
         totalPrice += add
         val iCount = Inventory.getCount
-        Wait.For(iCount != Inventory.getCount)
+        Wait.For(iCount != Inventory.getCount){}
       }
     }
     else {
       if (loot.interact("Take ")) {
         val iCount: Int = Inventory.getCount
-        Wait.For(iCount != Inventory.getCount)
+        Wait.For(iCount != Inventory.getCount){}
       }
     }
   }

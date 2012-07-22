@@ -35,7 +35,7 @@ abstract class UberScript extends ActiveScript with PaintListener with KeyListen
                                                       .getStorageDirectory + sep + "uberbots" + sep + name + sep + "logs" + sep + name,
                                                       name)
   protected        var changeLog         = Array[String]("Not set")
-  private          var setup             = false
+  private          var scriptSetup             = false
   protected        var paintType: IPaint = null
 
   private def sleep(min: Int, max: Int) {
@@ -46,7 +46,7 @@ abstract class UberScript extends ActiveScript with PaintListener with KeyListen
     Time.sleep(time)
   }
 
-  def onStart = {
+  def onStart() = {
     if (!Game.isLoggedIn) {
       logger.info("Not logged in... waiting for login random to finish")
       while (!Game.isLoggedIn || Skills.getLevel(Skills.AGILITY) < 1) sleep(100)
@@ -57,7 +57,7 @@ abstract class UberScript extends ActiveScript with PaintListener with KeyListen
     PaintController.reset()
     PaintController.startTimer()
     Options.add("prevVersion", manifest.version)
-    onBegin
+    setup()
   }
 
   def onFinish() {
@@ -70,13 +70,9 @@ abstract class UberScript extends ActiveScript with PaintListener with KeyListen
   def onEnd() {
   }
 
-  def onBegin = {
-    true
-  }
-
   def loop: Int = {
     try {
-      if (!setup) {
+      if (!scriptSetup) {
         if (Options.getDouble("prevVersion") < manifest.version) {
           PaintController
           .addComponent(new PDialogue("Script has been updated!", changeLog, new Font("Arial", 0, 12), PDialogue
@@ -98,7 +94,7 @@ abstract class UberScript extends ActiveScript with PaintListener with KeyListen
             }
           })
         }
-        setup = true
+        scriptSetup = true
       }
       if (!Game.isLoggedIn) return 100
       miscLoop()

@@ -27,10 +27,9 @@ class Logger(var logFile: File, name: String, loggingLevel: Int, fileExt: String
 
   import Logger._
 
-  private final val outputList              = new util.ArrayList[String]
-  private final val dFormat                 = new SimpleDateFormat("hh:mm:ss.SSS")
-  private       var logFile: File           = null
-  private       var wr     : BufferedWriter = null
+  private final val outputList         = new util.ArrayList[String]
+  private final val dFormat            = new SimpleDateFormat("hh:mm:ss.SSS")
+  private       var wr: BufferedWriter = null
   var loggingMode        = 0
   var scriptName: String = null
   private var stop = false
@@ -39,7 +38,7 @@ class Logger(var logFile: File, name: String, loggingLevel: Int, fileExt: String
   fileExtension = fileExt
   setLogFile(logFile)
   instance = this
-  new Thread(new Logger#OutputThread).start()
+  new Thread(new OutputThread).start()
 
   def this(logFile: String, name: String, loggingLevel: Int, fileExt: String) {
     this(new File(logFile), name, loggingLevel, fileExt)
@@ -213,7 +212,7 @@ class Logger(var logFile: File, name: String, loggingLevel: Int, fileExt: String
   /**
    * Class for handling threaded file writing to prevent slowdowns
    */
-  private[helpers] class OutputThread extends Runnable {
+  private class OutputThread extends Runnable {
     def run() {
       while (!stop) {
         try {

@@ -8,9 +8,10 @@ import org.powerbot.game.api.methods.tab.Inventory
 import org.powerbot.game.api.methods.tab.Prayer
 import org.powerbot.game.api.methods.tab.Skills
 import org.powerbot.game.api.util.Filter
-import org.powerbot.game.api.wrappers.Area
+import org.powerbot.game.api.wrappers.{Locatable, Area}
 import org.powerbot.game.api.wrappers.interactive.NPC
 import org.powerbot.game.api.wrappers.node.Item
+import org.powerbot.game.api.methods.Calculations
 
 object UberPlayer {
 
@@ -76,7 +77,7 @@ object UberPlayer {
   def attack(enemy: NPC): Boolean = {
     UberMovement.turnTo(enemy)
     if (enemy.interact("Attack"))
-      return Wait.For(inCombat(), 15)
+      return Wait.For(inCombat(), 15){}
     false
   }
 
@@ -135,6 +136,12 @@ object UberPlayer {
   def needToEat = hp < 50
 
   /**
+   * Gets Animation of Player
+   * @return Player Animation
+   */
+  def animation = get.getAnimation
+
+  /**
    * Check if inventory contains potions
    *
    * @return true if any potions were found
@@ -185,7 +192,7 @@ object UberPlayer {
     if (item == null || item.getWidgetChild.getActions == null || item.getWidgetChild.getActions.length < 1 || item
                                                                                                                .getWidgetChild
                                                                                                                .getActions()(0) == null) return false
-    item.getWidgetChild.getActions(0).contains("Eat")
+    item.getWidgetChild.getActions()(0).contains("Eat")
   }
 
   /**
