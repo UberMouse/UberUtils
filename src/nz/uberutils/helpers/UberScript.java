@@ -116,9 +116,9 @@ public abstract class UberScript extends ActiveScript implements PaintListener,
                 return 100;
             miscLoop();
             for (Strategy strategy : strategies) {
-                if (strategy.isValid()) {
+                if (strategy.validate()) {
                     status = strategy.getStatus();
-                    strategy.execute();
+                    strategy.run();
                     return Utils.random(400, 500);
                 }
             }

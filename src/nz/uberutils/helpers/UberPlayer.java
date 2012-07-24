@@ -18,13 +18,11 @@ import org.powerbot.game.api.wrappers.interactive.Player;
 import org.powerbot.game.api.wrappers.node.Item;
 
 
-public class UberPlayer
-{
+public class UberPlayer {
     /**
      * Enum for storing potions and there attributes
      */
-    private static enum Potions
-    {
+    private static enum Potions {
         EXTREME_ATTACK("Extreme attack", Skills.ATTACK),
         EXTREME_STRENGTH("Extreme strength", Skills.STRENGTH),
         EXTREME_DEFENCE("Extreme defence", Skills.DEFENSE),
@@ -137,11 +135,11 @@ public class UberPlayer
      */
     public static boolean inCombat(boolean multi) {
         if (multi)
-            return UberPlayer.isInteracting() && ((NPC)UberPlayer.interacting()).getHpPercent() > 0;
+            return UberPlayer.isInteracting() && ((NPC) UberPlayer.interacting()).getHpPercent() > 0;
         else
             return UberPlayer.isInteracting() &&
-                   ((NPC)UberPlayer.interacting()).getHpPercent() > 0 &&
-                   (getInteractor() != null && interacting().equals(getInteractor()) || getInteractor() == null);
+                    ((NPC) UberPlayer.interacting()).getHpPercent() > 0 &&
+                    (getInteractor() != null && interacting().equals(getInteractor()) || getInteractor() == null);
     }
 
     /**
@@ -187,6 +185,15 @@ public class UberPlayer
      */
     public static boolean isMoving() {
         return get().isMoving();
+    }
+
+    /**
+     * Get current animation of player
+     *
+     * @return animation id
+     */
+    public static int animation() {
+        return get().getAnimation();
     }
 
     /**
@@ -254,9 +261,9 @@ public class UberPlayer
 
     public static boolean isEdible(Item item) {
         if (item == null ||
-            item.getWidgetChild().getActions() == null ||
-            item.getWidgetChild().getActions().length < 1 ||
-            item.getWidgetChild().getActions()[0] == null)
+                item.getWidgetChild().getActions() == null ||
+                item.getWidgetChild().getActions().length < 1 ||
+                item.getWidgetChild().getActions()[0] == null)
             return false;
         return item.getWidgetChild().getActions()[0].contains("Eat");
     }
