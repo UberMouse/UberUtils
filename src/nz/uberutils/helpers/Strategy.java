@@ -1,5 +1,7 @@
 package nz.uberutils.helpers;
 
+import org.powerbot.concurrent.Task;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Taylor
@@ -7,11 +9,11 @@ package nz.uberutils.helpers;
  * Time: 11:51 AM
  * Package: nz.uberfalconry;
  */
-public interface Strategy
+public abstract class Strategy extends org.powerbot.concurrent.strategy.Strategy implements Task
 {
-    public void execute();
+    abstract public void run();
 
-    public boolean isValid();
+    abstract public boolean validate();
 
-    public String getStatus();
+    abstract public String getStatus();
 }
