@@ -1,5 +1,8 @@
 package nz.uberutils.helpers;
 
+import org.powerbot.concurrent.LoopTask;
+import org.powerbot.game.bot.Context;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,8 +18,7 @@ import java.util.Date;
  * Time: 11:51 PM
  * Package: nz.uberutils.helpers;
  */
-public class Logger
-{
+public class Logger {
     public static final int LOGGING_MODE_ALL     = 0;
     public static final int LOGGING_MODE_DEBUG   = 1;
     public static final int LOGGING_MODE_WARNING = 2;
@@ -30,8 +32,8 @@ public class Logger
     private       BufferedWriter    wr            = null;
     private       int               loggingMode   = 0;
     private       String            scriptName    = null;
-    private       boolean           stop          = false;
     private       String            fileExtension = ".txt";
+    private final java.util.logging.Logger logger;
 
     public Logger(File logFile, String name, int loggingLevel, String fileExt) {
         fileExtension = fileExt;
@@ -39,7 +41,8 @@ public class Logger
         setName(name);
         setLoggingMode(loggingLevel);
         instance = this;
-        new Thread(new OutputThread()).start();
+        logger = java.util.logging.Logger.getLogger(name);
+        Context.get().getActiveScript().submit(new OutputThread());
     }
 
     public Logger(String logFile, String name, int loggingLevel, String fileExt) {
@@ -70,9 +73,9 @@ public class Logger
      */
     public void setLogFile(File f) {
         String fName = f.getName() +
-                       "-" +
-                       new SimpleDateFormat("MMM-dd-EEE.hh-mm-ss").format(new Date()) +
-                       fileExtension;
+                "-" +
+                new SimpleDateFormat("MMM-dd-EEE.hh-mm-ss").format(new Date()) +
+                fileExtension;
         f = new File(f.getParent() + System.getProperty("file.separator") + fName);
         logFile = f;
         if (!f.exists())
@@ -109,7 +112,6 @@ public class Logger
      * Perform cleanup and finishing operations, should always be closed on application exit
      */
     public void cleanup() {
-        stop = true;
         if (wr != null) {
             try {
                 wr.close();
@@ -148,7 +150,7 @@ public class Logger
         }
         String msg = lvlMessage + ": " + message;
         if (lvlMessage.equals("TRACE"))
-            java.util.logging.Logger.getLogger(scriptName).info(msg);
+            logger.info(message);
         outputList.add(msg);
     }
 
@@ -231,26 +233,20 @@ public class Logger
     /**
      * Class for handling threaded file writing to prevent slowdowns
      */
-    class OutputThread implements Runnable
-    {
-        public void run() {
-            while (!stop) {
+    class OutputThread extends LoopTask {
+        @Override
+        public int loop() {
+            if (!outputList.isEmpty() && wr != null) {
                 try {
-                    if (!outputList.isEmpty() && wr != null) {
-                        try {
-                            wr.write(dFormat.format(new Date()) + " " + scriptName + " " + outputList.get(0) + "\r\n");
-                            wr.flush();
-                            outputList.remove(0);
-                        } catch (IOException e) {
-                            System.err.println("Error writing output to log");
-                            e.printStackTrace();
-                        }
-                    }
-                    Thread.sleep(25);
-                } catch (InterruptedException e) {
+                    wr.write(dFormat.format(new Date()) + " " + scriptName + " " + outputList.get(0) + "\r\n");
+                    wr.flush();
+                    outputList.remove(0);
+                } catch (IOException e) {
+                    System.err.println("Error writing output to log");
                     e.printStackTrace();
                 }
             }
+            return 25;
         }
     }
 }

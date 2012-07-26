@@ -22,13 +22,7 @@ import java.util.Map;
 public class UberPaint implements IPaint
 {
     public UberPaint(final String name, final int threadId, final double version) {
-        PaintController.addComponent(new PFancyButton(8, 450, "ArteBots", PFancyButton.ColorScheme.GRAPHITE)
-        {
-            public void onPress() {
-                Utils.openURL("http://artebots.com");
-            }
-        });
-        PaintController.addComponent(new PFancyButton(59, 450, "Feedback", PFancyButton.ColorScheme.GRAPHITE)
+        PaintController.addComponent(new PFancyButton(8, 501, "Feedback", PFancyButton.ColorScheme.GRAPHITE)
         {
             public void onPress() {
                 Utils.openURL("http://rsbuddy.com/forum/showthread.php?t=" + threadId);
@@ -36,7 +30,7 @@ public class UberPaint implements IPaint
         });
         addFrame("info");
         addFrame("options");
-        PaintController.addComponent(new PFancyButton(461, 481, 54, 24, "Hide", PFancyButton.ColorScheme.GRAPHITE)
+        PaintController.addComponent(new PFancyButton(461, 531, 54, 24, "Hide", PFancyButton.ColorScheme.GRAPHITE)
         {
             public void onStart() {
                 forceMouse = true;
@@ -49,8 +43,8 @@ public class UberPaint implements IPaint
                 PaintController.toggleEvents();
             }
         });
-        addTab("Info", 440, 345, 73, -1, 0, -1);
-        addTab("Options", 440, 365, 73, -1, 1, -1);
+        addTab("Info", 440, 396, 73, -1, 0, -1);
+        addTab("Options", 440, 416, 73, -1, 1, -1);
         this.version = version;
         this.name = name;
     }
@@ -125,7 +119,7 @@ public class UberPaint implements IPaint
             PComponent clayout = null;
             try {
                 clayout = new PColumnLayout(227,
-                        354,
+                        404,
                         infoColumnValues,
                         infoColumnData,
                         new Font("Arial", 0, 9),
@@ -166,13 +160,13 @@ public class UberPaint implements IPaint
             }
             secondColx = 8 + bestLength;
             firstLayout = new PCheckBoxLayout(8,
-                    362,
+                    407,
                     firstColumn.keySet().toArray(new String[(firstColumn.size() > 6) ? 6 : firstColumn.size()]),
                     firstColumn.values().toArray(new PCheckBox[(firstColumn.size() > 6) ? 6 : firstColumn.size()]),
                     new Font("Arial", 0, 11),
                     PCheckBoxLayout.ColorScheme.WHITE);
             secondLayout = new PCheckBoxLayout(secondColx + 12,
-                    362,
+                    407,
                     secondColumn.keySet().toArray(new String[(secondColumn.size() > 6) ? 6 : secondColumn.size()]),
                     secondColumn.values().toArray(new PCheckBox[(secondColumn.size() > 6) ? 6 : secondColumn.size()]),
                     new Font("Arial", 0, 11),
@@ -187,7 +181,7 @@ public class UberPaint implements IPaint
                         512,
                         472,
                         new Color(15, 15, 15, 240)));
-                g.fillRect(7, 345, 505, 127);
+                g.fillRect(7, 396, 505, 128);
                 final Point loc = Mouse.getLocation();
                 if (Mouse.isPressed()) {
                     g.fillOval(loc.x - 5, loc.y - 5, 10, 10);
@@ -212,7 +206,7 @@ public class UberPaint implements IPaint
             int offset = 0;
             for (Skill skill : skills) {
                 if (skill.xpGained() > 0) {
-                    PSkill skillComp = new PSkill(8, 346 + offset, skill.getSkill(), PSkill.ColorScheme.GRAPHITE);
+                    PSkill skillComp = new PSkill(8, 397 + offset, skill.getSkill(), PSkill.ColorScheme.GRAPHITE);
                     if (!getFrame("info").containsComponent(skillComp)) {
                         getFrame("info").addComponent(skillComp);
                     }

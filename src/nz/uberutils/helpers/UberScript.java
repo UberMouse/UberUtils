@@ -3,6 +3,7 @@ package nz.uberutils.helpers;
 import nz.uberutils.helpers.tasks.PriceThread;
 import nz.uberutils.paint.PaintController;
 import nz.uberutils.paint.components.PDialogue;
+import org.powerbot.concurrent.LoopTask;
 import org.powerbot.game.api.ActiveScript;
 import org.powerbot.game.api.Manifest;
 import org.powerbot.game.api.methods.Environment;
@@ -14,7 +15,6 @@ import org.powerbot.game.bot.event.listener.PaintListener;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,28 +24,16 @@ import java.util.ArrayList;
  * Package: nz.uberutils.helpers;
  */
 public abstract class UberScript extends ActiveScript implements PaintListener,
-                                                                 KeyListener,
-                                                                 MouseListener,
-                                                                 MouseMotionListener
-{
-    protected       String              status     = "Starting...";
-    protected final ArrayList<Strategy> strategies = new ArrayList<Strategy>();
-    private final   Manifest            manifest   = getClass().getAnnotation(Manifest.class);
-    protected final String              name       = manifest.name();
-    protected int threadId;
+        KeyListener,
+        MouseListener,
+        MouseMotionListener {
+    public static   String   status   = "Starting...";
+    protected final Manifest manifest = getClass().getAnnotation(Manifest.class);
+    protected final String   name     = manifest.name();
     String sep = System.getProperty("file.separator");
-    protected final Logger   logger    = new Logger(Environment.getStorageDirectory() +
-                                                    sep +
-                                                    "uberbots" +
-                                                    sep +
-                                                    name +
-                                                    sep +
-                                                    "logs" +
-                                                    sep +
-                                                    name, name);
-    protected       String[] changeLog = new String[]{"Not set"};
-    private         boolean  setup     = false;
-    protected       IPaint   paintType = null;
+    protected Logger   logger    = null;
+    protected String[] changeLog = new String[]{"Not set"};
+    protected IPaint   paintType = null;
 
     private void sleep(int min, int max) {
         Time.sleep(min, max);
@@ -55,24 +43,51 @@ public abstract class UberScript extends ActiveScript implements PaintListener,
         Time.sleep(time);
     }
 
-    public boolean onStart() {
+    public void setup() {
+        logger = new Logger(Environment.getStorageDirectory().getAbsoluteFile() +
+                                    sep +
+                                    "uberbots" +
+                                    sep +
+                                    name +
+                                    sep +
+                                    "logs" +
+                                    sep +
+                                    name, name);
         if (!Game.isLoggedIn()) {
-
             logger.info("Not logged in... waiting for login random to finish");
             while (!Game.isLoggedIn() || Skills.getLevel(Skills.AGILITY) < 1)
                 sleep(100);
             sleep(3000);
         }
-        //Todo see if possible to get RS account name
         Options.setNode(name + Context.client().getCurrentUsername());
         getContainer().submit(new PriceThread());
         PaintController.reset();
         PaintController.startTimer();
         Options.add("prevVersion", manifest.version());
-        return onBegin();
+        if (Options.getDouble("prevVersion") < manifest.version()) {
+            PaintController.addComponent(new PDialogue("Script has been updated!",
+                                                       changeLog,
+                                                       new Font("Arial", 0, 12),
+                                                       PDialogue.ColorScheme.GRAPHITE,
+                                                       PDialogue.Type.INFORMATION) {
+                public void okClick() {
+                    PaintController.removeComponent(this);
+                }
+
+                public boolean shouldHandleMouse() {
+                    return shouldPaint();
+                }
+
+                public boolean shouldPaint() {
+                    return Game.isLoggedIn();
+                }
+            });
+        }
+        getContainer().submit(new LoopThread());
+        onBegin();
     }
 
-    public void onFinish() {
+    public void onStop() {
         Options.put("prevVersion", manifest.version());
         Options.save();
         logger.cleanup();
@@ -83,53 +98,7 @@ public abstract class UberScript extends ActiveScript implements PaintListener,
 
     }
 
-    public boolean onBegin() {
-        return true;
-    }
-
-    public int loop() {
-        try {
-            if (!setup) {
-                if (Options.getDouble("prevVersion") < manifest.version()) {
-                    PaintController.addComponent(new PDialogue("Script has been updated!",
-                            changeLog,
-                            new Font("Arial", 0, 12),
-                            PDialogue.ColorScheme.GRAPHITE,
-                            PDialogue.Type.INFORMATION)
-                    {
-                        public void okClick() {
-                            PaintController.removeComponent(this);
-                        }
-
-                        public boolean shouldHandleMouse() {
-                            return shouldPaint();
-                        }
-
-                        public boolean shouldPaint() {
-                            return Game.isLoggedIn();
-                        }
-                    });
-                }
-                setup = true;
-            }
-            if (!Game.isLoggedIn())
-                return 100;
-            miscLoop();
-            for (Strategy strategy : strategies) {
-                if (strategy.validate()) {
-                    status = strategy.getStatus();
-                    strategy.run();
-                    return Utils.random(400, 500);
-                }
-            }
-        } catch (Exception e) {
-            //if (Utils.isDevMode())
-            //    e.printStackTrace();
-        }
-        return 0;
-    }
-
-    protected void miscLoop() {
+    public void onBegin() {
 
     }
 
@@ -202,5 +171,18 @@ public abstract class UberScript extends ActiveScript implements PaintListener,
 
     protected void paint(Graphics2D g) {
 
+    }
+
+    public void update() {
+
+    }
+
+    private class LoopThread extends LoopTask {
+
+        @Override
+        public int loop() {
+            update();
+            return 100;
+        }
     }
 }

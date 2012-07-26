@@ -11,7 +11,12 @@ import org.powerbot.concurrent.Task;
  */
 public abstract class Strategy extends org.powerbot.concurrent.strategy.Strategy implements Task
 {
-    abstract public void run();
+    public void run() {
+        UberScript.status = getStatus();
+        loop();
+    }
+
+    abstract public void loop();
 
     abstract public boolean validate();
 
